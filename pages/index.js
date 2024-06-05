@@ -1,10 +1,13 @@
 import Link from 'next/link';
 
-export default function HomePage(){
+import { getFeaturedEvents } from '../service/events.js';
+import EventList from '../components/events/event-list.js';
+
+export default function HomePage() {
+    const featuredEvents = getFeaturedEvents();
     return (
-        <>
-        <h1>Home Page</h1>
-        <Link href="/events">Browse Events</Link>
-        </>
+        <div>
+            <EventList items={featuredEvents}/>
+        </div>
     )
 }
