@@ -1,5 +1,8 @@
-import classes from './event-item.module.css';
 import Button from '../common/button.js';
+import DateIcon from '../icons/date-icon.js';
+import AddressIcon from '../icons/address-icon.js';
+import ArrowRightIcon from '../icons/arrow-right-icon.js';
+import classes from './event-item.module.css';
 
 export default function EventItem({ id, title, image, date, location }) {
     const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -16,9 +19,11 @@ export default function EventItem({ id, title, image, date, location }) {
                 <div className={classes.summary}>
                     <h2>{title}</h2>
                     <div className={classes.date}>
+                        <DateIcon />
                         <time>{formattedDate}</time>
                     </div>
                     <div className={classes.address}>
+                        <AddressIcon />
                         <address>{formattedAddress}</address>
                     </div>
                 </div>
@@ -29,7 +34,8 @@ export default function EventItem({ id, title, image, date, location }) {
                             query: { id: id }
                         }}
                     >
-                        Explore Event
+                        <span> Explore Event</span>
+                        <span className={classes.icon}><ArrowRightIcon/></span>
                     </Button>
                 </div>
             </div>
