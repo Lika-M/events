@@ -1,6 +1,5 @@
-import Link from 'next/link';
-
 import classes from './event-item.module.css';
+import Button from '../common/button.js';
 
 export default function EventItem({ id, title, image, date, location }) {
     const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -24,14 +23,14 @@ export default function EventItem({ id, title, image, date, location }) {
                     </div>
                 </div>
                 <div className={classes.actions}>
-                    <Link
-                        href={{
+                    <Button
+                        link={{
                             pathname: '/events/[id]',
                             query: { id: id }
                         }}
                     >
                         Explore Event
-                    </Link>
+                    </Button>
                 </div>
             </div>
         </li>
