@@ -28,6 +28,7 @@ ul {
 }
 
 .center {
+  padding: 20px 0;
   margin: auto;
   text-align: center;
 }
