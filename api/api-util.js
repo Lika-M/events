@@ -24,9 +24,20 @@ export async function getAllEvents() {
 export async function getFeaturedEvents() {
     try {
         const allEvents = await getAllEvents();
-         return allEvents.filter((event) => event.isFeatured);
+        return allEvents.filter((event) => event.isFeatured);
     } catch (error) {
         console.error('Error fetching featured events:', error);
         return [];
     }
 }
+
+export async function getEventById(id) {
+    try {
+        const allEvents = await getAllEvents();
+        return allEvents.find(event => event.id === id) || null;
+    } catch (error) {
+        console.error('Error fetching event by ID:', error);
+        return null;
+    }
+}
+
