@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
 // import { getEventById } from "../../service/events.js";
-import { getEventById, getAllEvents } from "../../api/api-util.js";
+import { getEventById, getFeaturedEvents } from "../../api/api-util.js";
 import EventSummary from "../../components/event-detail/event-summary.js";
 import EventLogistics from "../../components/event-detail/event-logistics.js";
 import EventContent from "../../components/event-detail/event-content.js";
@@ -9,19 +9,12 @@ import ErrorAlert from "../../components/common/error-alert.js";
 import Button from "../../components/common/button.js";
 
 export default function EventDetailPage({ event }) {
-    // const router = useRouter();
-    // const eventId = router.query.id;
-
-    // const event = getEventById(eventId);
 
     if (!event) {
         return (
             <>
-                <ErrorAlert>
-                    <p>No event found.</p>
-                </ErrorAlert>
                 <div className="center">
-                    <Button link="/events">Show All Events</Button>
+                    <p>No event found.</p>
                 </div>
             </>
         );
@@ -46,12 +39,13 @@ export async function getStaticProps(context) {
     return {
         props: {
             event
-        }
+        },
+        revalidate: 30
     }
 }
 
 export async function getStaticPaths() {
-    const allEvents = await getAllEvents();
+    const allEvents = await getFeaturedEvents();
 
     const paths = allEvents.map(ev => (
         { params: { id: ev.id } }
@@ -59,7 +53,7 @@ export async function getStaticPaths() {
 
     return {
         paths,
-        //if there's not other specified paths
-        fallback: false
+        //no page view until the data is fetched
+        fallback: 'blocking'
     }
 }

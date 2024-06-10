@@ -3,7 +3,6 @@ import { getFeaturedEvents } from '../api/api-util.js';
 import EventList from '../components/events/event-list.js';
 
 export default function HomePage({events}) {
-    // const featuredEvents = getFeaturedEvents();
     return (
         <div>
             <EventList items={events}/>
@@ -17,6 +16,8 @@ export async function getStaticProps(){
     return {
         props: {
             events: featuredEvents
-        }
+        },
+        //at most once every 10 min
+        revalidate: 600
     }
 }
