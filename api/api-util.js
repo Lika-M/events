@@ -41,3 +41,21 @@ export async function getEventById(id) {
     }
 }
 
+export async function findEventsByDate(selectedYear, selectedMonth) {
+
+    try {
+        const allEvents = await getAllEvents();
+        return allEvents.filter(event => {
+            let [year, month] = event.date.split('-');
+
+            if (month.startsWith('0')) {
+                month = month[1];
+            }
+            return year === selectedYear && month === selectedMonth;
+        });
+    } catch (error) {
+        console.error('Error fetching filtered events:', error);
+        return null;
+    }
+}
+

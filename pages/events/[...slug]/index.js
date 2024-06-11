@@ -1,28 +1,20 @@
 import { useRouter } from "next/router";
+import { redirect } from "next/dist/server/api-utils/index.js";
 
-import { findEventsByDate } from "../../../service/events.js";
+import { findEventsByDate } from "../../../api/api-util.js";
 import EventList from "../../../components/events/event-list.js";
 import SearchTitle from "../../../components/events/search-title.js";
 import Button from "../../../components/common/button.js";
 import ErrorAlert from "../../../components/common/error-alert.js";
 
-export default function FilteredEventsPage() {
-    const router = useRouter();
-    const selectedData = router.query.slug;
+export default function FilteredEventsPage({ events, date, hasError }) {
+    // const router = useRouter();
 
-    // first rendering
-    if (!selectedData) {
-        return (<p className="center">Loading...</p>);
-    }
-    const [year, month] = selectedData;
-    const isInvalid = selectedData.length > 2
-        || isNaN(Number(year))
-        || isNaN(Number(month))
-        || Number(year) > 2030
-        || Number(month) < 1
-        || Number(month) > 12;
+    // if (!events) {
+    //     return (<p className="center">Loading...</p>);
+    // }
 
-    if (isInvalid) {
+    if (hasError) {
         return (
             <>
                 <ErrorAlert>
@@ -35,7 +27,6 @@ export default function FilteredEventsPage() {
         );
     }
 
-    const events = findEventsByDate(year, month);
 
     if (!events || events.length === 0) {
         return (
@@ -50,12 +41,46 @@ export default function FilteredEventsPage() {
         );
     }
 
-    const date = new Date(Number(year), Number(month) - 1);
-
     return (
         <>
             <SearchTitle date={date} />
             <EventList items={events} />
         </>
     );
+}
+
+export async function getServerSideProps(context) {
+    const selectedData = context.params.slug;
+    const [year, month] = selectedData;
+
+    const isInvalid = selectedData.length > 2
+        || isNaN(Number(year))
+        || isNaN(Number(month))
+        || Number(year) > 2030
+        || Number(month) < 1
+        || Number(month) > 12;
+
+    if (isInvalid) {
+        return {
+            // notFound: true,
+            // redirect: {
+            //     destination: '/error'
+            // }
+
+            props: {
+                hasError: true
+            }
+        }
+    }
+    const events = await findEventsByDate(year, month);
+
+    return {
+        props: {
+            events,
+            date: {
+                year: Number(year),
+                month: Number(month)
+            }
+        }
+    }
 }
