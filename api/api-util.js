@@ -1,4 +1,5 @@
-const URL = 'https://next13-events-default-rtdb.europe-west1.firebasedatabase.app/events.json';
+export const URL = 'https://next13-events-default-rtdb.europe-west1.firebasedatabase.app/events.json';
+export const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export async function getAllEvents() {
     try {
