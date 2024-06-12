@@ -1,34 +1,76 @@
 import { useRouter } from "next/router";
-import { redirect } from "next/dist/server/api-utils/index.js";
+import { useState, useEffect } from "react";
+import useSWR from 'swr';
 
-import { findEventsByDate } from "../../../api/api-util.js";
 import EventList from "../../../components/events/event-list.js";
 import SearchTitle from "../../../components/events/search-title.js";
 import Button from "../../../components/common/button.js";
 import ErrorAlert from "../../../components/common/error-alert.js";
+import { URL, fetcher } from "../../../api/api-util.js";
 
-export default function FilteredEventsPage({ events, date, hasError }) {
-    // const router = useRouter();
+export default function FilteredEventsPage() {
+    const [events, setEvents] = useState([]);
+    const router = useRouter();
 
-    // if (!events) {
-    //     return (<p className="center">Loading...</p>);
-    // }
+    const { data, error, isLoading } = useSWR(URL, fetcher);
 
-    if (hasError) {
+    useEffect(() => {
+        if (data) {
+            const allEvents = Object.entries(data).map(([key, value]) => ({
+                id: key,
+                ...value
+            }));
+            setEvents(allEvents);
+        }
+    }, [data]);
+
+    if (isLoading) {
+        return (<p className="center">Loading...</p>);
+    }
+
+    if (!router.query.slug) {
+        return null;
+    }
+
+    const selectedData = router.query.slug;
+    const [selectedYear, selectedMonth] = selectedData || [];
+
+    if (!selectedYear || !selectedMonth) {
+        return null;
+    }
+
+    const isInvalid = 
+        selectedData.length > 2 ||
+        isNaN(Number(selectedYear)) ||
+        isNaN(Number(selectedMonth)) ||
+        Number(selectedYear) > 2030 ||
+        Number(selectedMonth) < 1 ||
+        Number(selectedMonth) > 12 ||
+        error;
+
+    if (isInvalid) {
         return (
             <>
                 <ErrorAlert>
                     <p>Invalid filter!</p>
                 </ErrorAlert>
-                <div className="center" >
+                <div className="center">
                     <Button link="/events">Show All Events</Button>
                 </div>
             </>
         );
     }
 
+    const filteredEvents = events.filter(event => {
+        let [year, month] = event.date.split('-');
 
-    if (!events || events.length === 0) {
+        if (month.startsWith('0')) {
+            month = month[1];
+        }
+        return year === selectedYear && month === selectedMonth;
+    });
+
+    if (!filteredEvents || filteredEvents.length === 0) {
         return (
             <>
                 <ErrorAlert>
@@ -41,46 +83,12 @@ export default function FilteredEventsPage({ events, date, hasError }) {
         );
     }
 
+    const date = new Date(Number(selectedYear), Number(selectedMonth) - 1);
+
     return (
         <>
             <SearchTitle date={date} />
-            <EventList items={events} />
+            <EventList items={filteredEvents} />
         </>
     );
-}
-
-export async function getServerSideProps(context) {
-    const selectedData = context.params.slug;
-    const [year, month] = selectedData;
-
-    const isInvalid = selectedData.length > 2
-        || isNaN(Number(year))
-        || isNaN(Number(month))
-        || Number(year) > 2030
-        || Number(month) < 1
-        || Number(month) > 12;
-
-    if (isInvalid) {
-        return {
-            // notFound: true,
-            // redirect: {
-            //     destination: '/error'
-            // }
-
-            props: {
-                hasError: true
-            }
-        }
-    }
-    const events = await findEventsByDate(year, month);
-
-    return {
-        props: {
-            events,
-            date: {
-                year: Number(year),
-                month: Number(month)
-            }
-        }
-    }
 }
