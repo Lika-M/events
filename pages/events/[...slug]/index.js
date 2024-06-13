@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import useSWR from 'swr';
@@ -7,6 +6,7 @@ import EventList from "../../../components/events/event-list.js";
 import SearchTitle from "../../../components/events/search-title.js";
 import Button from "../../../components/common/button.js";
 import ErrorAlert from "../../../components/common/error-alert.js";
+import HeadContent from "../../../components/common/headContent";
 import { URL, fetcher } from "../../../api/api-util.js";
 
 export default function FilteredEventsPage() {
@@ -25,16 +25,13 @@ export default function FilteredEventsPage() {
         }
     }, [data]);
 
-    let headContent = (
-        <Head>
-            <title>Events</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-            <meta name="description" content="Find events"></meta>
-        </Head>
-    );
-
     if (isLoading) {
-        return (<p className="center">Loading...</p>);
+        return (
+            <>
+                <HeadContent title="Events" content="Find events" />
+                <p className="center">Loading...</p>
+            </>
+        );
     }
 
     if (!router.query.slug) {
@@ -60,7 +57,7 @@ export default function FilteredEventsPage() {
     if (isInvalid) {
         return (
             <>
-            {headContent}
+                <HeadContent title="Events" content="Find events" />
                 <ErrorAlert>
                     <p>Invalid filter!</p>
                 </ErrorAlert>
@@ -83,7 +80,7 @@ export default function FilteredEventsPage() {
     if (!filteredEvents || filteredEvents.length === 0) {
         return (
             <>
-            {headContent}
+                <HeadContent title="Events" content="Find events" />
                 <ErrorAlert>
                     <p>No events found for the chosen filter.</p>
                 </ErrorAlert>
@@ -95,17 +92,13 @@ export default function FilteredEventsPage() {
     }
 
     const date = new Date(Number(selectedYear), Number(selectedMonth) - 1);
-    headContent = (
-        <Head>
-            <title>{`Events ${selectedMonth}/${selectedYear}`}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-            <meta name="description" content={`All incredible events for ${selectedYear}/${selectedMonth}`}></meta>
-        </Head>
-    );
 
     return (
         <>
-            {headContent}
+            <HeadContent
+                title={`Events ${selectedMonth}/${selectedYear}`}
+                content={`All incredible events for ${selectedYear}/${selectedMonth}`}
+            />
             <SearchTitle date={date} />
             <EventList items={filteredEvents} />
         </>
