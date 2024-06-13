@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import useSWR from 'swr';
@@ -24,6 +25,14 @@ export default function FilteredEventsPage() {
         }
     }, [data]);
 
+    let headContent = (
+        <Head>
+            <title>Events</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+            <meta name="description" content="Find events"></meta>
+        </Head>
+    );
+
     if (isLoading) {
         return (<p className="center">Loading...</p>);
     }
@@ -39,7 +48,7 @@ export default function FilteredEventsPage() {
         return null;
     }
 
-    const isInvalid = 
+    const isInvalid =
         selectedData.length > 2 ||
         isNaN(Number(selectedYear)) ||
         isNaN(Number(selectedMonth)) ||
@@ -51,6 +60,7 @@ export default function FilteredEventsPage() {
     if (isInvalid) {
         return (
             <>
+            {headContent}
                 <ErrorAlert>
                     <p>Invalid filter!</p>
                 </ErrorAlert>
@@ -73,6 +83,7 @@ export default function FilteredEventsPage() {
     if (!filteredEvents || filteredEvents.length === 0) {
         return (
             <>
+            {headContent}
                 <ErrorAlert>
                     <p>No events found for the chosen filter.</p>
                 </ErrorAlert>
@@ -84,9 +95,17 @@ export default function FilteredEventsPage() {
     }
 
     const date = new Date(Number(selectedYear), Number(selectedMonth) - 1);
+    headContent = (
+        <Head>
+            <title>{`Events ${selectedMonth}/${selectedYear}`}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+            <meta name="description" content={`All incredible events for ${selectedYear}/${selectedMonth}`}></meta>
+        </Head>
+    );
 
     return (
         <>
+            {headContent}
             <SearchTitle date={date} />
             <EventList items={filteredEvents} />
         </>
