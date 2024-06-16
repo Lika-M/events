@@ -44,7 +44,7 @@
 @media (min-width: 768px) {
   .logistics {
     padding: 2rem;
-    margin: -5rem auto;
+    margin: -1rem auto;
     gap: 3rem;
     flex-direction: row;
     align-items: stretch;
@@ -62,5 +62,15 @@
 
   .list {
     align-items: flex-start;
+  }
+}
+
+@media (min-width: 1000px){
+  .logistics {
+    padding: 2rem;
+    margin: -3rem auto;
+    gap: 3rem;
+    flex-direction: row;
+    align-items: stretch;
   }
 }

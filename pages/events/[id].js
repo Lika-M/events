@@ -3,10 +3,11 @@ import EventSummary from "../../components/event-detail/event-summary.js";
 import EventLogistics from "../../components/event-detail/event-logistics.js";
 import EventContent from "../../components/event-detail/event-content.js";
 import HeadContent from "../../components/common/headContent";
+import Comments from "../../components/comments/comments.js";
 
 
 export default function EventDetailPage({ event }) {
-  
+
     if (!event) {
         return (
             <>
@@ -17,15 +18,16 @@ export default function EventDetailPage({ event }) {
             </>
         );
     }
- 
+
     return (
         <>
-           <HeadContent title={event.title} content={event.description} />
+            <HeadContent title={event.title} content={event.description} />
             <EventSummary title={event.title} />
             <EventLogistics {...event} />
             <EventContent>
                 <p>{event.description}</p>
             </EventContent>
+            <Comments eventId={event.id} />
         </>
 
     );
