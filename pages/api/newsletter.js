@@ -1,15 +1,9 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
-
-const uri = 'mongodb+srv://Lika-M:t0cDyE1rfD2w1U20@cluster0.wnmsq4o.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
-
-
+import { connectDB, insertDocument } from "../../api/db-util.js";
 
 export default async function handler(req, res) {
-    console.log("Request received");
 
     if (req.method === 'POST') {
-    
+
         const email = req.body.email;
 
         if (!email || !email.includes('@') || !email.includes('.')) {
@@ -17,33 +11,28 @@ export default async function handler(req, res) {
             return res.status(422).json({ message: 'Invalid email address.' });
         }
 
-        const client = new MongoClient(uri, {
-            serverApi: {
-                version: ServerApiVersion.v1,
-                strict: true,
-                deprecationErrors: true,
-            }
-        });
+        let client;
 
         try {
-            await client.connect();
+            client = await connectDB();
+        } catch (error) {
+            res.status(500).json({ message: 'Connecting to the DB failed.' });
+            return;
+        }
 
-            const db = client.db('events'); 
-            const collection = db.collection('newsletter');
-            
-            const result = await collection.insertOne({ email: email });
-            res.status(201).json({ email: email, message: 'Signed up.', result: result });
+        try {
+            const result = await insertDocument(client, 'newsletter', { email: email });
+            await client.close();
+            res.status(201).json({ email: email, message: 'Signed up.', result: result});
 
         } catch (error) {
-           
-            res.status(500).json({ message: 'Storing email failed!' });
-        } finally {
-
-            await client.close();
+            res.status(500).json({ message: 'Inserting data to the DB failed.' });
+            return;
         }
+
     } else {
-       
         res.status(405).json({ message: 'We only support POST requests.' });
     }
+
 }
 
