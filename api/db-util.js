@@ -1,8 +1,8 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-const uri = 'mongodb+srv://Lika-M:t0cDyE1rfD2w1U20@cluster0.wnmsq4o.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
+const uri = 'mongodb+srv://Lika-M:ZXXPK3X8JdZOOaUb@atlascluster.tcca3nt.mongodb.net/?retryWrites=true&w=majority&appName=AtlasCluster'
 export async function connectDB() {
+
     const client = new MongoClient(uri, {
         serverApi: {
             version: ServerApiVersion.v1,
@@ -20,3 +20,14 @@ export async function insertDocument(client, collectionName, document) {
     const result = await collection.insertOne(document);
     return result;
 }
+
+export async function readDocument(client, collectionName){
+    const db =client.db('events');
+    const collection = await db.collection(collectionName)
+    .find()
+    .toArray();
+    return collection;
+}
+
+
+
