@@ -51,8 +51,10 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
             const result = await readDocument(client, 'comments');
-            const allComments = result.sort((a, b) => b._id - a._id );
-            console.log(allComments)
+            const allComments = result
+            .filter(c => c._id === eventId)
+            .sort((a, b) => b._id - a._id );
+           
             res.status(200).json({ comments: allComments });
         } catch (error) {
             return res.status(422).json({ message: 'Getting comments failed.' })
